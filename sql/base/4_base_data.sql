@@ -96,8 +96,8 @@ INSERT [dbo].[tblIMISDefaultsPhone] ([RuleName], [RuleValue], [Usage]) VALUES (N
 INSERT [dbo].[tblIMISDefaultsPhone] ([RuleName], [RuleValue], [Usage]) VALUES (N'AllowFamilyWithoutPolicy', 0, 'Allow synchronization of Families without a Policy.')
 INSERT [dbo].[tblIMISDefaultsPhone] ([RuleName], [RuleValue], [Usage]) VALUES (N'AllowPolicyWithoutPremium', 0, 'Allow synchronization of Policies without a Contribution. If ShowPaymentOption is false, this rule value is read as true.')
 INSERT [dbo].[tblIMISDefaultsPhone] ([RuleName], [RuleValue], [Usage]) VALUES (N'ShowPaymentOption', 1, 'Show or hide the Payment option to allow or not to add a Contribution for a Policy. ')
-INSERT [dbo].[tblLanguages] ([LanguageCode], [LanguageName], [SortOrder]) VALUES (N'en', N'English', 1) -- By default english is set as primary language, required by SMS
-INSERT [dbo].[tblLanguages] ([LanguageCode], [LanguageName], [SortOrder]) VALUES (N'fr', N'Français', 2)
+INSERT [dbo].[tblLanguages] ([LanguageCode], [LanguageName], [SortOrder], [CountryCode]) VALUES (N'en', N'English', 1, N'gb') -- By default english is set as primary language, required by SMS
+INSERT [dbo].[tblLanguages] ([LanguageCode], [LanguageName], [SortOrder], [CountryCode]) VALUES (N'fr', N'Français', 2, N'fr')
 INSERT [dbo].[tblLegalForms] ([LegalFormCode], [LegalForms], [SortOrder], [AltLanguage]) VALUES (N'C', N'Charity', NULL, N'Charité')
 INSERT [dbo].[tblLegalForms] ([LegalFormCode], [LegalForms], [SortOrder], [AltLanguage]) VALUES (N'D', N'District organization', NULL, N'Organisation du district')
 INSERT [dbo].[tblLegalForms] ([LegalFormCode], [LegalForms], [SortOrder], [AltLanguage]) VALUES (N'G', N'Government', NULL, N'Gouvernement')

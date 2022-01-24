@@ -10484,3 +10484,6 @@ IF COL_LENGTH(N'tblLanguages', N'CountryCode') IS NULL
 	ALTER TABLE tblLanguages
 	ADD [CountryCode] NVARCHAR(10) NULL
 GO
+
+UPDATE tblLanguages SET CountryCode = N'gb' WHERE LanguageCode LIKE '%en';
+UPDATE tblLanguages SET CountryCode = N'fr' WHERE LanguageCode LIKE '%fr';
