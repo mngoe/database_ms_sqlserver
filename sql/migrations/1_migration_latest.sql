@@ -3494,3 +3494,18 @@ UPDATE tblPolicy
 SET EffectiveDate = NULL
 WHERE ValidityTo IS NULL AND EffectiveDate = '1900-01-01' and PolicyStatus = 1
 GO
+
+ALTER TABLE [tblInsuree]
+add Dead BIT default 'FALSE'
+GO
+
+update [tblInsuree]
+set Dead=0;
+
+ALTER TABLE [tblInsuree]
+add DOD DATE NULL
+GO
+
+ALTER TABLE [tblInsuree]
+add DeathReason VARCHAR(500) NULL
+GO
