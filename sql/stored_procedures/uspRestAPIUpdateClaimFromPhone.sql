@@ -77,6 +77,12 @@ BEGIN
 			IF NOT OBJECT_ID('tempdb..#tblService') IS NULL DROP TABLE #tblService
 			CREATE TABLE #tblService(ServiceCode NVARCHAR(6),ServicePrice DECIMAL(18,2), ServiceQuantity INT)
 
+			IF NOT OBJECT_ID('tempdb..#tblServiceServices') IS NULL DROP TABLE #tblServiceServices
+			CREATE TABLE #tblServiceServices(ServiceCode NVARCHAR(6), ServiceId NVARCHAR(6), price DECIMAL(18,2), qty INT, ServiceLinked INT)
+
+			IF NOT OBJECT_ID('tempdb..#tblServiceItems') IS NULL DROP TABLE #tblServiceItems
+			CREATE TABLE #tblServiceItems(ItemCode NVARCHAR(6),ItemPrice DECIMAL(18,2), ItemQuantity INT, idService INT)
+
 			--SET @Query = (N'SELECT @XML = CAST(X as XML) FROM OPENROWSET(BULK '''+ @FileName +''',SINGLE_BLOB) AS T(X)')
 
 			--EXECUTE SP_EXECUTESQL @Query,N'@XML XML OUTPUT',@XML OUTPUT
@@ -116,6 +122,13 @@ BEGIN
 			CONVERT(DECIMAL(18,2),T.[Services].value('(ServicePrice)[1]','DECIMAL(18,2)')),
 			CONVERT(DECIMAL(18,2),T.[Services].value('(ServiceQuantity)[1]','NVARCHAR(15)'))
 			FROM @XML.nodes('Claim/Services/Service') AS T([Services])
+
+            INSERT INTO #tblServiceServices(ServiceCode,price,qty)
+			SELECT
+			T.[SubServicesItems].value('(Code)[1]','NVARCHAR(6)'),
+			CONVERT(DECIMAL(18,2),T.[SubServicesItems].value('(Price)[1]','DECIMAL(18,2)')),
+			CONVERT(DECIMAL(18,2),T.[SubServicesItems].value('(Quantity)[1]','NVARCHAR(15)'))
+			FROM @XML.nodes('Claim/Services/Service/SubServicesItems') AS T([SubServicesItems])
 
 			--isValid HFCode
 
@@ -182,6 +195,12 @@ BEGIN
 			--isValid ServiceCode
 			IF EXISTS(SELECT S.ServCode
 			FROM tblServices S FULL OUTER JOIN #tblService TS ON S.ServCode COLLATE DATABASE_DEFAULT = TS.ServiceCode COLLATE DATABASE_DEFAULT
+			WHERE S.ServCode IS NULL AND S.ValidityTo IS NULL)
+				RETURN 8
+
+			--isValid ServiceCode
+			IF EXISTS(SELECT S.ServCode
+			FROM tblServices S FULL OUTER JOIN #tblServiceServices TS ON S.ServCode COLLATE DATABASE_DEFAULT = TS.ServiceCode COLLATE DATABASE_DEFAULT
 			WHERE S.ServCode IS NULL AND S.ValidityTo IS NULL)
 				RETURN 8
 
