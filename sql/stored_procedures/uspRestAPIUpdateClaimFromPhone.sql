@@ -291,12 +291,6 @@ BEGIN
 			FROM #tblServiceItems t
             LEFT OUTER JOIN tblItems ti on t.ItemCode COLLATE DATABASE_DEFAULT = ti.ItemCode
 
-            DECLARE @msg NVARCHAR(MAX);
-            SET @msg = 'Insertion TBL Service Service';
-            
-            EXEC dw.Log_ProcedureCall @ObjectID = @@PROCID,
-                @AdditionalInfo = @msg;
-
 		COMMIT TRAN CLAIM
 
 
