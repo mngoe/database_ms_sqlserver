@@ -142,10 +142,10 @@ BEGIN
 
 
 	--Get the number of adults, Children, OtherAdult and Other Children from the family
-		SET @AdultMembers = (SELECT COUNT(InsureeId) FROM #tblInsuree WHERE DATEDIFF(YEAR,DOB,GETDATE()) >= 18 AND ISNULL(Relationship,0) <> 7 AND ValidityTo IS NULL AND FamilyID = @FamilyId) 
-		SET @ChildMembers = (SELECT COUNT(InsureeId) FROM #tblInsuree WHERE DATEDIFF(YEAR,DOB,GETDATE()) < 18 AND ISNULL(Relationship,0) <> 7  AND ValidityTo IS NULL AND FamilyID = @FamilyId)
-		SET @OAdultMembers = (SELECT COUNT(InsureeId) FROM #tblInsuree WHERE DATEDIFF(YEAR,DOB,GETDATE()) >= 18 AND ISNULL(Relationship,0) = 7 AND ValidityTo IS NULL AND FamilyID = @FamilyId) 
-		SET @OChildMembers = (SELECT COUNT(InsureeId) FROM #tblInsuree WHERE DATEDIFF(YEAR,DOB,GETDATE()) < 18 AND ISNULL(Relationship,0) = 7 AND ValidityTo IS NULL AND FamilyID = @FamilyId)
+		SET @AdultMembers = (SELECT COUNT(InsureeId) FROM #tblInsuree WHERE DATEDIFF(YEAR,DOB,GETDATE()) >= 13 AND ISNULL(Relationship,0) <> 7 AND ValidityTo IS NULL AND FamilyID = @FamilyId) 
+		SET @ChildMembers = (SELECT COUNT(InsureeId) FROM #tblInsuree WHERE DATEDIFF(YEAR,DOB,GETDATE()) < 13 AND ISNULL(Relationship,0) <> 7  AND ValidityTo IS NULL AND FamilyID = @FamilyId)
+		SET @OAdultMembers = (SELECT COUNT(InsureeId) FROM #tblInsuree WHERE DATEDIFF(YEAR,DOB,GETDATE()) >= 13 AND ISNULL(Relationship,0) = 7 AND ValidityTo IS NULL AND FamilyID = @FamilyId) 
+		SET @OChildMembers = (SELECT COUNT(InsureeId) FROM #tblInsuree WHERE DATEDIFF(YEAR,DOB,GETDATE()) < 13 AND ISNULL(Relationship,0) = 7 AND ValidityTo IS NULL AND FamilyID = @FamilyId)
 
 
 	--Get extra members in family
@@ -3704,8 +3704,8 @@ BEGIN
 	FROM tblProduct WHERE ProdID = @ProdId
 
 	/*--Get all the required fiedls from family--*/
-	SET @AdultMembers = (SELECT COUNT(InsureeId) FROM tblInsuree WHERE DATEDIFF(YEAR,DOB,GETDATE()) >= 18 AND ValidityTo IS NULL AND FamilyID = @FamilyId) 
-	SET @ChildMembers = (SELECT COUNT(InsureeId) FROM tblInsuree WHERE DATEDIFF(YEAR,DOB,GETDATE()) < 18 AND ValidityTo IS NULL AND FamilyID = @FamilyId)
+	SET @AdultMembers = (SELECT COUNT(InsureeId) FROM tblInsuree WHERE DATEDIFF(YEAR,DOB,GETDATE()) >= 13 AND ValidityTo IS NULL AND FamilyID = @FamilyId) 
+	SET @ChildMembers = (SELECT COUNT(InsureeId) FROM tblInsuree WHERE DATEDIFF(YEAR,DOB,GETDATE()) < 13 AND ValidityTo IS NULL AND FamilyID = @FamilyId)
 
 	/*--Get the General Assembly Fee Depending on the Product Definition--*/
 	IF @GeneralAssemblyLumpSum > 0
@@ -5985,7 +5985,7 @@ BEGIN
 			SET @Hospitalization = 0  --Day visit/treatment 
 
 		SELECT @DOB = DOB FROM tblInsuree WHERE InsureeID = @InsureeID 
-		IF DATEDIFF(YY  ,@DOB,@TargetDate ) >=18 
+		IF DATEDIFF(YY  ,@DOB,@TargetDate ) >=13 
 			SET @AdultChild = 'A'
 		ELSE
 			SET @AdultChild = 'C'
@@ -6180,7 +6180,7 @@ BEGIN
 			SET @Hospitalization = 0  --Day visit/treatment 
 
 		SELECT @DOB = DOB FROM tblInsuree WHERE InsureeID = @InsureeID 
-		IF DATEDIFF(YY  ,@DOB,@TargetDate ) >=18 
+		IF DATEDIFF(YY  ,@DOB,@TargetDate ) >=13 
 			SET @AdultChild = 'A'
 		ELSE
 			SET @AdultChild = 'C'

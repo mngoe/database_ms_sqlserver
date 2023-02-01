@@ -73,11 +73,11 @@ BEGIN
 			IF NOT OBJECT_ID('tempdb..#tblService') IS NULL DROP TABLE #tblService
 			CREATE TABLE #tblService(ServiceCode NVARCHAR(6),ServicePrice DECIMAL(18,2), ServiceQuantity INT)
 
-			IF NOT OBJECT_ID('tempdb..#tblServiceService') IS NULL DROP TABLE #tblServiceService
-			CREATE TABLE #tblServiceService(ServiceCode NVARCHAR(6),price DECIMAL(18,2), qty INT, ServiceLinked NVARCHAR(6))
+			IF NOT OBJECT_ID('temptblServiceService') IS NULL DROP TABLE temptblServiceService
+			CREATE TABLE temptblServiceService(ServiceCode NVARCHAR(6),price DECIMAL(18,2), qty INT, ServiceLinked NVARCHAR(6))
 
-			IF NOT OBJECT_ID('tempdb..#tblServiceItems') IS NULL DROP TABLE #tblServiceItems
-			CREATE TABLE #tblServiceItems(ItemCode NVARCHAR(6),ItemPrice DECIMAL(18,2), ItemQuantity INT, idService INT)
+			IF NOT OBJECT_ID('temptblServiceItems') IS NULL DROP TABLE temptblServiceItems
+			CREATE TABLE temptblServiceItems(ItemCode NVARCHAR(6),ItemPrice DECIMAL(18,2), ItemQuantity INT, idService INT)
 
 
 			--SET @Query = (N'SELECT @XML = CAST(X as XML) FROM OPENROWSET(BULK '''+ @FileName +''',SINGLE_BLOB) AS T(X)')
@@ -118,7 +118,7 @@ BEGIN
 			CONVERT(DECIMAL(18,2),T.[Services].value('(ServiceQuantity)[1]','NVARCHAR(15)'))
 			FROM @XML.nodes('Claim/Services/Service') AS T([Services])
 
-            INSERT INTO #tblServiceService(ServiceCode, price, qty)
+            INSERT INTO temptblServiceService(ServiceCode, price, qty)
 			SELECT
 			T.[ServicesServices].value('(Code)[1]','NVARCHAR(6)'),
 			CONVERT(DECIMAL(18,2),T.[ServicesServices].value('(Price)[1]','DECIMAL(18,2)')),
@@ -126,7 +126,7 @@ BEGIN
             FROM @XML.nodes('Claim/Services/Service/SubServicesItems/SubServicesItems') AS T([ServicesServices])
             where T.[ServicesServices].value('(Type)[1]','NVARCHAR(1)') = 'S'
 
-            INSERT INTO #tblServiceItems(ItemCode,ItemPrice,ItemQuantity)
+            INSERT INTO temptblServiceItems(ItemCode,ItemPrice,ItemQuantity)
 			SELECT
 			T.[Services].value('(Code)[1]','NVARCHAR(6)'),
 			CONVERT(DECIMAL(18,2),T.[Services].value('(Price)[1]','DECIMAL(18,2)')),
@@ -198,7 +198,7 @@ BEGIN
 
 			--isValid ServiceItemCode
 			IF EXISTS (SELECT I.ItemCode
-			FROM tblItems I FULL OUTER JOIN #tblServiceItems TI ON I.ItemCode COLLATE DATABASE_DEFAULT = TI.ItemCode COLLATE DATABASE_DEFAULT
+			FROM tblItems I FULL OUTER JOIN temptblServiceItems TI ON I.ItemCode COLLATE DATABASE_DEFAULT = TI.ItemCode COLLATE DATABASE_DEFAULT
 			WHERE I.ItemCode IS NULL AND I.ValidityTo IS NULL)
 				RETURN 7
 
@@ -210,7 +210,7 @@ BEGIN
 
 			--isValid ServiceServiceCode
 			IF EXISTS(SELECT S.ServCode
-			FROM tblServices S FULL OUTER JOIN #tblServiceService TS ON S.ServCode COLLATE DATABASE_DEFAULT = TS.ServiceCode COLLATE DATABASE_DEFAULT
+			FROM tblServices S FULL OUTER JOIN temptblServiceService TS ON S.ServCode COLLATE DATABASE_DEFAULT = TS.ServiceCode COLLATE DATABASE_DEFAULT
 			WHERE S.ServCode IS NULL AND S.ValidityTo IS NULL)
 				RETURN 8
 
@@ -283,12 +283,12 @@ BEGIN
 
             INSERT INTO tblClaimServicesService(ServiceID, qty_provided, qty_displayed, price, claimlinkedService,created_date)
 			SELECT ts.ServiceID,t.qty,t.qty,t.price,@ClaimServiceID, getdate()
-			FROM #tblServiceService T
+			FROM temptblServiceService T
             LEFT OUTER JOIN tblServices ts on t.ServiceCode COLLATE DATABASE_DEFAULT = ts.ServCode
 
             INSERT INTO tblClaimServicesItems(ItemID, qty_provided, qty_displayed, price, ClaimServiceID,created_date)
 			SELECT ti.ItemID,t.ItemQuantity,t.ItemQuantity,t.ItemPrice,@ClaimServiceID, getdate()
-			FROM #tblServiceItems t
+			FROM temptblServiceItems t
             LEFT OUTER JOIN tblItems ti on t.ItemCode COLLATE DATABASE_DEFAULT = ti.ItemCode
 
 		COMMIT TRAN CLAIM
