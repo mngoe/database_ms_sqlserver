@@ -53,19 +53,25 @@ CREATE PROCEDURE [dbo].[uspConsumeEnrollments](
 	DECLARE @tblResult TABLE(Result NVARCHAR(Max))
 	DECLARE @tblIds TABLE(OldId INT, [NewId] INT)
 
+	DECLARE @minchfId INT = 0
+    DECLARE @minchfId INT = 999999999
+    DECLARE @randomNum DECIMAL(18,0)
+    
+    
 	BEGIN TRY
 
 		--SET @Query = (N'SELECT @XML = CAST(X as XML) FROM OPENROWSET(BULK  '''+ @File +''' ,SINGLE_BLOB) AS T(X)')
 
 		--EXECUTE SP_EXECUTESQL @Query,N'@XML XML OUTPUT',@XML OUTPUT
-
+		SET @randomNumId = FLOOR(RAND() * (@max - @min + 1) + @min)
+    	SELECT @RandomNumberId = RIGHT('000000000' + CAST(@randomNum AS VARCHAR(9)),9)
 
 		--GET ALL THE FAMILY FROM THE XML
 		INSERT INTO @tblFamilies(FamilyId,InsureeId,CHFID, LocationId,Poverty,FamilyType,FamilyAddress,Ethnicity, ConfirmationNo,ConfirmationType, isOffline)
 		SELECT 
 		T.F.value('(FamilyId)[1]','INT'),
 		T.F.value('(InsureeId)[1]','INT'),
-		T.F.value('(HOFCHFID)[1]','NVARCHAR(50)'),
+		@RandomNumberId,
 		T.F.value('(LocationId)[1]','INT'),
 		T.F.value('(Poverty)[1]','BIT'),
 		NULLIF(T.F.value('(FamilyType)[1]','NVARCHAR(2)'),''),
@@ -80,12 +86,15 @@ CREATE PROCEDURE [dbo].[uspConsumeEnrollments](
 		--Get total number of families sent via XML
 		SELECT @FamilySent = COUNT(*) FROM @tblFamilies
 
+		SET @randomNumId = FLOOR(RAND() * (@max - @min + 1) + @min)
+    	SELECT @RandomNumberId = RIGHT('000000000' + CAST(@randomNum AS VARCHAR(9)),9)
+
 		--GET ALL THE INSUREES FROM XML
 		INSERT INTO @tblInsuree(InsureeId,FamilyId,CHFID,LastName,OtherNames,DOB,Gender,Marital,IsHead,Passport,Phone,CardIssued,Relationship,Profession,Education,Email, TypeOfId, HFID, CurrentAddress, GeoLocation, CurVillage, isOffline,PhotoPath, Vulnerability)
 		SELECT
 		T.I.value('(InsureeId)[1]','INT'),
 		T.I.value('(FamilyId)[1]','INT'),
-		T.I.value('(CHFID)[1]','NVARCHAR(50)'),
+		@RandomNumberId,
 		T.I.value('(LastName)[1]','NVARCHAR(100)'),
 		T.I.value('(OtherNames)[1]','NVARCHAR(100)'),
 		T.I.value('(DOB)[1]','DATE'),
